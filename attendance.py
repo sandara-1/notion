@@ -78,5 +78,4 @@ if st.button("출석 저장 📝"):
 
     # 다운로드 링크 제공
     st.download_button("엑셀로 저장하기", data=open(excel_file_name, "rb").read(), file_name=excel_file_name, mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-주요 변경 사항
 
