@@ -43,19 +43,9 @@ for student in students:
 # 출석 저장 버튼
 if st.button("출석 저장 📝"):
     attendance_records = {name: status for name, status in attendance_status.items()}
-
     # 출석 결과를 표시하기 위해 DataFrame으로 변환
     df = pd.DataFrame(attendance_records.items(), columns=["학생 이름", "출석 여부"])
     df["출석 여부"] = df["출석 여부"].apply(lambda x: "출석" if x else "결석")
 
-    # 엑셀 파일로 저장
-    excel_file_name = f"attendance_{selected_date}.xlsx"
-    df.to_excel(excel_file_name, index=False)  # 엑셀 파일 저장
-
     st.success(f"{selected_date} 출석 기록이 저장되었습니다:")
-
-    # 결과 출력
     st.dataframe(df)  # 출석 결과를 테이블 형태로 출력
-
-    # 다운로드 링크 제공
-    st.download_button("엑셀로 저장하기", data=open(excel_file_name, "rb").read(), file_name=excel_file_name, mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
