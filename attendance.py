@@ -35,7 +35,7 @@ date_options = [
 ]
 
 # 제목 설정
-st.title("학생 출석부 🌟")
+st.title("동아리 방송부 결석체크 🌟")
 
 # 날짜 선택하기
 selected_date = st.selectbox("날짜 선택", date_options)
@@ -55,12 +55,12 @@ special_notes = st.text_area("특기사항", st.session_state.special_notes.get(
 
 
 # 출석 저장 버튼
-if st.button("출석 저장 📝"):
+if st.button("결석 저장 📝"):
     attendance_records = {name: status for name, status in attendance_status.items()}
 
     # 출석 결과를 표시하기 위해 DataFrame으로 변환
     df = pd.DataFrame(attendance_records.items(), columns=["학생 이름", "출석 여부"])
-    df["출석 여부"] = df["출석 여부"].apply(lambda x: "출석" if x else "결석")
+    df["결석 여부"] = df["결석 여부"].apply(lambda x: "결석" if x else " ")
 
     # 특기사항을 DataFrame에 추가
     df["특기사항"] = special_notes
@@ -68,7 +68,7 @@ if st.button("출석 저장 📝"):
     # 특기사항 저장
     st.session_state.special_notes[special_note_key] = special_notes
 
-    st.success(f"{selected_date} 출석 기록이 저장되었습니다:")
+    st.success(f"{selected_date} 결석 기록이 저장되었습니다:")
 
     # 결과 출력
     st.dataframe(df)  # 출석 결과를 테이블 형태로 출력
