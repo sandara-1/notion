@@ -46,7 +46,12 @@ for student in students:
     attendance_status[student['name']] = st.checkbox(f"{student['name']} ({student['id']})")
 
 # 특기사항 입력
-special_notes = st.text_area("특기사항", "여기에 특기사항을 입력하세요...")
+if 'special_notes' not in st.session_state:
+    st.session_state.special_notes = {}
+
+# 선택한 날짜에 해당하는 특기사항 관리
+special_note_key = f"special_note_{selected_date}"
+special_notes = st.text_area("특기사항", st.session_state.special_notes.get(special_note_key, "여기에 특기사항을 입력하세요..."))
 
 # 출석 저장 버튼
 if st.button("출석 저장 📝"):
