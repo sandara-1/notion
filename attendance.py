@@ -1,7 +1,4 @@
-pip install tkcalendar pillow
-import tkinter
-import tkcalendar
-from PIL import Image
+
 
 import tkinter as tk
 from tkinter import messagebox
