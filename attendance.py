@@ -81,8 +81,8 @@ if st.button("결석 저장 📝"):
     df["특기사항"] = [special_notes[f"{student['name']}_note"] for student in students]  # 특기사항 수집
     df["날짜"] = selected_date  # 날짜 추가
 
-    # "출석 여부" 열을 제거하고 "결석 여부"를 "학생 이름" 옆에 위치하도록 설정
-    df = df[["학생 이름", "결석 여부", "특기사항", "날짜"]]  # 새로운 열 순서 설정
+    # 열 순서 조정 및 "출석 여부" 제거
+    df = df[["학생 이름", "결석 여부", "특기사항", "날짜"]]  # 필요한 열 순서로 설정
 
     # 데이터 추가 방식 변경 (이전 기록을 덮어쓰기)
     records_for_date = pd.read_csv(attendance_file) if os.path.isfile(attendance_file) else pd.DataFrame()
@@ -117,7 +117,7 @@ if os.path.isfile(attendance_file):
     records_for_date = pd.read_csv(attendance_file)
     filtered_records = records_for_date[records_for_date["날짜"] == selected_previous_date]
 
-    st.dataframe(filtered_records)  # 선택한 날짜의 결석 기록을 데이터프레임으로 보여주기
+    st.dataframe(filtered_records[["학생 이름", "결석 여부", "특기사항"]])  # 선택한 날짜의 결석 기록을 데이터프레임으로 보여주기, "출석 여부"는 제거
 
     # 삭제 기능
     if st.button("선택된 기록 삭제 ❌"):
