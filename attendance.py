@@ -59,26 +59,29 @@ if st.button("결석 저장 📝"):
     # 출석 상태 기록
     attendance_records = {name: status for name, status in attendance_status.items()}
 
-    # 출석 결과를 표시하기 위해 DataFrame으로 변환
-    df = pd.DataFrame(attendance_records.items(), columns=["학생 이름", "결석 여부"])
-    df["결석 여부"] = df["결석 여부"].apply(lambda x: "✖️" if x else "⭕")  # 올바른 열 이름 사용
 
     # 특기사항을 DataFrame에 추가
     df["특기사항"] = special_notes
 
-
     # 특기사항과 출석 기록을 세션 상태에 저장
     st.session_state.special_notes[special_note_key] = special_notes
+
     if 'attendance_records' not in st.session_state:
         st.session_state.attendance_records = {}
 
-    # 날짜별 출석 결과를 저장
-    st.session_state.attendance_records[selected_date] = df
+    # 각 날짜에 대한 출석 기록이 리스트 형식으로 저장되도록 향상
+    if selected_date in st.session_state.attendance_records:
+        # 기존 기록에 추가
+        st.session_state.attendance_records[selected_date].append(df)
+    else:
+        # 새로운 날짜에 대한 기록 생성
+        st.session_state.attendance_records[selected_date] = [df]
 
     st.success(f"{selected_date} 출석 기록이 저장되었습니다.")
 
 # 저장된 출석 기록이 있다면 보여주기
 if 'attendance_records' in st.session_state:
-    for date, records in st.session_state.attendance_records.items():
+    for date, records_list in st.session_state.attendance_records.items():
         st.subheader(f"{date} 출석 기록")
-        st.dataframe(records)  # 출석 결과를 테이블 형태로 출력
+        for records in records_list:
+            st.dataframe(records)  # 출석 결과를 테이블 형태로 출력
