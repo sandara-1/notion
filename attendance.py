@@ -108,8 +108,10 @@ if os.path.isfile(attendance_file):
 
     # 선택한 날짜의 출석 기록을 필터링
     records_for_date = pd.read_csv(attendance_file)
-    records_for_date = records_for_date[records_for_date["날짜"] == selected_previous_date]
+    filtered_records = records_for_date[records_for_date["날짜"] == selected_previous_date]
 
-    st.dataframe(records_for_date)  # 선택한 날짜의 출석 기록을 데이터프레임으로 보여주기
-else:
-    st.warning("현재 저장된 출석 기록이 없습니다.")
+    st.dataframe(filtered_records)  # 선택한 날짜의 출석 기록을 데이터프레임으로 보여주기
+
+    # 삭제 기능
+    if st.button("선택된 기록 삭제 ❌"):
+        records_for_date = records_for_date[records_for
