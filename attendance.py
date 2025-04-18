@@ -114,4 +114,8 @@ if os.path.isfile(attendance_file):
 
     # 삭제 기능
     if st.button("선택된 기록 삭제 ❌"):
-        records_for_date = records_for_date[records_for
+        records_for_date = records_for_date[records_for_date["날짜"] != selected_previous_date]  # 삭제할 날짜의 기록 제거
+        records_for_date.to_csv(attendance_file, mode='w', index=False)  # 업데이트된 내용을 파일에 저장
+        st.success(f"{selected_previous_date} 출석 기록이 삭제되었습니다.")
+else:
+    st.warning("현재 저장된 출석 기록이 없습니다.")
