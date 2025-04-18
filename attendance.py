@@ -25,7 +25,7 @@ students = [
 # 설정할 날짜 목록
 date_options = [
     '2025-05-02 (금) 6, 7교시',
-    '2025-07-04 (금) 6, 7교시 ',
+    '2025-07-04 (금) 6, 7교시',
     '2025-08-22 (금) 6, 7교시',
     '2025-09-12 (금) 6, 7교시',
     '2025-10-17 (금) 6, 7교시',
@@ -77,11 +77,18 @@ if st.button("출석 저장 📝"):
     df["특기사항"] = [special_notes[f"{student['name']}_note"] for student in students]  # 특기사항 수집
     df["날짜"] = selected_date  # 날짜 추가
 
-    # 파일이 이미 존재하는 경우, 데이터를 추가
-    if os.path.isfile(attendance_file):
-        df.to_csv(attendance_file, mode='a', header=False, index=False)  # 기존 데이터에 추가
-    else:
-        df.to_csv(attendance_file, mode='w', index=False)  # 새로 생성
+    # 데이터 추가 방식 변경 (이전 기록을 덮어쓰기)
+    records_for_date = pd.read_csv(attendance_file) if os.path.isfile(attendance_file) else pd.DataFrame()
+
+    if not records_for_date.empty:
+        # 날짜에 따른 기존 출석 기록 지우기
+        records_for_date = records_for_date[records_for_date["날짜"] != selected_date]
+
+    # 새로운 출석 기록 추가
+    records_for_date = pd.concat([records_for_date, df], ignore_index=True)
+
+    # 저장
+    records_for_date.to_csv(attendance_file, mode='w', index=False)
 
     # 세션 상태에 각각의 출석 기록과 특기사항 저장
     st.session_state[selected_date] = {}
@@ -102,6 +109,7 @@ if os.path.isfile(attendance_file):
     # 선택한 날짜의 출석 기록을 필터링
     records_for_date = pd.read_csv(attendance_file)
     records_for_date = records_for_date[records_for_date["날짜"] == selected_previous_date]
+
     st.dataframe(records_for_date)  # 선택한 날짜의 출석 기록을 데이터프레임으로 보여주기
 else:
     st.warning("현재 저장된 출석 기록이 없습니다.")
