@@ -53,7 +53,6 @@ if 'special_notes' not in st.session_state:
 special_note_key = f"special_note_{selected_date}"
 special_notes = st.text_area("특기사항", st.session_state.special_notes.get(special_note_key, "여기에 특기사항을 입력하세요..."))
 
-
 # 출석 저장 버튼
 if st.button("출석 저장 📝"):
     # 출석 상태 기록
@@ -73,7 +72,16 @@ if st.button("출석 저장 📝"):
         st.session_state.attendance_records = {}
 
     # 날짜에 대한 출석 기록 업데이트
-    if selected_date in st.session_state.attendance_records:
-        st.session_state.attendance_records[selected_date].append(df)  # 이전 기록에 추가
-    else:
-        st.session_state.attendance_records[selected_date] = [df]  # 새로 생성
+    if selected_date not in st.session_state.attendance_records:
+        st.session_state.attendance_records[selected_date] = []  # 새로 생성
+    st.session_state.attendance_records[selected_date].append(df)  # 이전 기록에 추가
+
+    st.success(f"{selected_date} 출석 기록이 저장되었습니다.")
+
+# 저장된 출석 기록이 있다면 보여주기
+if 'attendance_records' in st.session_state:
+    for date, records_list in st.session_state.attendance_records.items():
+        st.subheader(f"{date} 출석 기록")
+        for records in records_list:
+            st.dataframe(records)  # 각 기록을 테이블 형태로 출력
+
