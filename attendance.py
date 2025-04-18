@@ -75,11 +75,12 @@ if st.button("출석 저장 📝"):
         try:
             previous_records = pd.read_csv(attendance_file)
         except pd.errors.ParserError:
-            os.remove(attendance_file)  # 파일 삭제
+            os.remove(attendance_file)  # 잘못된 CSV 파일 삭제
 
     # 파일에 데이터 저장
     df.to_csv(attendance_file, mode='w', index=False)
 
+    # 세션 상태에 특기사항 저장
     st.session_state.special_notes[special_note_key] = special_notes
     st.success(f"{selected_date} 출석 기록이 저장되었습니다.")
 
@@ -91,4 +92,7 @@ if os.path.isfile(attendance_file):
         st.dataframe(previous_records)  # 이전 기록을 데이터프레임으로 보여주기
     except pd.errors.ParserError:
         st.error("CSV 파일이 잘못된 형식입니다. 파일을 삭제하였습니다.")
-    except Exception as
+    except Exception as e:  # 오류 메시지를 표시할 때 변수 명시
+        st.error(f"파일을 읽는 동안 오류가 발생했습니다: {e}")
+else:
+    st.warning("현재 저장된 출석 기록이 없습니다.")
