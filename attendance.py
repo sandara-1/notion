@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import os
 
 # 학생 목록
 students = [
@@ -21,7 +22,7 @@ students = [
     {"id": "21205", "name": "김도하 🌈"},
 ]
 
-# 설정할 날짜 목록(선택할 날짜)
+# 설정할 날짜 목록
 date_options = [
     '2025-05-02 (금) 6, 7교시',
     '2025-07-04 (금) 6, 7교시 ',
@@ -35,7 +36,10 @@ date_options = [
 ]
 
 # 제목 설정
-st.title("동아리 방송부 결석체크 🌟")
+st.title("동아리 방송부 결석 체크 🌟")
+
+# 파일 이름 정의
+attendance_file = "attendance_records.csv"
 
 # 날짜 선택하기
 selected_date = st.selectbox("날짜 선택", date_options)
@@ -58,30 +62,28 @@ if st.button("출석 저장 📝"):
     # 출석 상태 기록
     attendance_records = {name: status for name, status in attendance_status.items()}
 
-    # 출석 결과를 표시하기 위해 DataFrame으로 변환
+    # 출석 결과로 DataFrame 생성
     df = pd.DataFrame(attendance_records.items(), columns=["학생 이름", "출석 여부"])
     df["출석 여부"] = df["출석 여부"].apply(lambda x: "출석" if x else "결석")  # 결과를 적절하게 표시
 
     # 특기사항을 DataFrame에 추가
     df["특기사항"] = special_notes
 
-    # 세션 상태에 저장
+    # 세션 상태에 특기사항 저장
     st.session_state.special_notes[special_note_key] = special_notes
 
-    if 'attendance_records' not in st.session_state:
-        st.session_state.attendance_records = {}
-
-    # 날짜에 대한 출석 기록 업데이트
-    if selected_date not in st.session_state.attendance_records:
-        st.session_state.attendance_records[selected_date] = []  # 새로 생성
-    st.session_state.attendance_records[selected_date].append(df)  # 이전 기록에 추가
+    # 날짜와 출석 기록 저장
+    if not os.path.isfile(attendance_file):
+        # 파일이 없으면 새로운 파일 생성
+        df.to_csv(attendance_file, mode='w', index=False)
+    else:
+        # 파일이 있으면 추가
+        df.to_csv(attendance_file, mode='a', index=False, header=False)
 
     st.success(f"{selected_date} 출석 기록이 저장되었습니다.")
 
-# 저장된 출석 기록이 있다면 보여주기
-if 'attendance_records' in st.session_state:
-    for date, records_list in st.session_state.attendance_records.items():
-        st.subheader(f"{date} 출석 기록")
-        for records in records_list:
-            st.dataframe(records)  # 각 기록을 테이블 형태로 출력
-
+# 저장된 출석 기록을 불러오기
+if os.path.isfile(attendance_file):
+    st.subheader("이전 출석 기록")
+    previous_records = pd.read_csv(attendance_file)
+    st.dataframe(previous_records)  # 이전 기록을 데이터프레임으로 보여주기
