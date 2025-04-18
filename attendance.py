@@ -59,7 +59,7 @@ if st.button("결석 저장 📝"):
     attendance_records = {name: status for name, status in attendance_status.items()}
 
     # 출석 결과를 표시하기 위해 DataFrame으로 변환
-    df = pd.DataFrame(attendance_records.items(), columns=["학생 이름", "출석 여부"])
+    df = pd.DataFrame(attendance_records.items(), columns=["학생 이름", "결석 여부"])
     df["결석 여부"] = df["결석 여부"].apply(lambda x: "결석" if x else "출석")
 
     # 특기사항을 DataFrame에 추가
