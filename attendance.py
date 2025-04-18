@@ -44,7 +44,7 @@ attendance_file = "attendance_records.csv"
 # 날짜 선택하기
 selected_date = st.selectbox("날짜 선택", date_options)
 
-# 출석 체크 박스 표시 및 특기사항 입력
+# 결석 체크 박스 표시 및 특기사항 입력
 attendance_status = {}
 special_notes = {}
 
@@ -52,12 +52,12 @@ special_notes = {}
 if selected_date not in st.session_state:
     st.session_state[selected_date] = {}
 
-# 학생별 출석 체크 및 특기사항 입력
+# 학생별 결석 체크 및 특기사항 입력
 for student in students:
     # 열을 생성하여 체크박스와 특기사항 입력을 나란히 배치
     col1, col2 = st.columns([2, 5])  # 체크박스는 더 좁게, 입력은 더 넓게
     with col1:
-        # 출석 체크박스 생성
+        # 결석 체크박스 생성
         attendance_status[student['name']] = st.checkbox(f"{student['name']} ({student['id']})",
                                                          value=st.session_state[selected_date].get(student['name'], False))
 
@@ -68,12 +68,12 @@ for student in students:
                                                          value=st.session_state[selected_date].get(special_note_key, ""),
                                                          key=special_note_key)  # 특정 키를 설정하여 일관성을 유지
 
-# 출석 저장 버튼
+# 결석 저장 버튼
 if st.button("결석 저장 📝"):
-    # 출석 상태 기록
+    # 결석 상태 기록
     attendance_records = {name: status for name, status in attendance_status.items()}
 
-    # 출석 결과로 DataFrame 생성
+    # 결석 결과로 DataFrame 생성
     df = pd.DataFrame(attendance_records.items(), columns=["학생 이름", "결석 여부"])
     df["결석 여부"] = df["결석 여부"].apply(lambda x: "✖️" if x else "⭕")  # 결과를 적절하게 표시
 
@@ -85,41 +85,41 @@ if st.button("결석 저장 📝"):
     records_for_date = pd.read_csv(attendance_file) if os.path.isfile(attendance_file) else pd.DataFrame()
 
     if not records_for_date.empty:
-        # 날짜에 따른 기존 출석 기록 지우기
+        # 날짜에 따른 기존 결석 기록 지우기
         records_for_date = records_for_date[records_for_date["날짜"] != selected_date]
 
-    # 새로운 출석 기록 추가
+    # 새로운 결석 기록 추가
     records_for_date = pd.concat([records_for_date, df], ignore_index=True)
 
     # 저장
     records_for_date.to_csv(attendance_file, mode='w', index=False)
 
-    # 세션 상태에 각각의 출석 기록과 특기사항 저장
+    # 세션 상태에 각각의 결석 기록과 특기사항 저장
     st.session_state[selected_date] = {}
     for student in students:
         st.session_state[selected_date][student['name']] = attendance_status[student['name']]
         st.session_state[selected_date][f"{student['name']}_note"] = special_notes[f"{student['name']}_note"]
 
-    st.success(f"{selected_date} 출석 기록이 저장되었습니다.")
+    st.success(f"{selected_date} 결석 기록이 저장되었습니다.")
 
-# 저장된 출석 기록을 선택하기 위한 날짜 선택
+# 저장된 결석 기록을 선택하기 위한 날짜 선택
 if os.path.isfile(attendance_file):
-    st.subheader("이전 출석 기록 보기")
+    st.subheader("이전 결석 기록 보기")
 
     # 날짜 선택 옵션을 추가
     previous_dates = pd.read_csv(attendance_file)["날짜"].unique()
     selected_previous_date = st.selectbox("날짜 선택", previous_dates)
 
-    # 선택한 날짜의 출석 기록을 필터링
+    # 선택한 날짜의 결석 기록을 필터링
     records_for_date = pd.read_csv(attendance_file)
     filtered_records = records_for_date[records_for_date["날짜"] == selected_previous_date]
 
-    st.dataframe(filtered_records)  # 선택한 날짜의 출석 기록을 데이터프레임으로 보여주기
+    st.dataframe(filtered_records)  # 선택한 날짜의 결석 기록을 데이터프레임으로 보여주기
 
     # 삭제 기능
     if st.button("선택된 기록 삭제 ❌"):
         records_for_date = records_for_date[records_for_date["날짜"] != selected_previous_date]  # 삭제할 날짜의 기록 제거
         records_for_date.to_csv(attendance_file, mode='w', index=False)  # 업데이트된 내용을 파일에 저장
-        st.success(f"{selected_previous_date} 출석 기록이 삭제되었습니다.")
+        st.success(f"{selected_previous_date} 결석 기록이 삭제되었습니다.")
 else:
-    st.warning("현재 저장된 출석 기록이 없습니다.")
+    st.warning("현재 저장된 결석 기록이 없습니다.")
