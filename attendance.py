@@ -69,13 +69,13 @@ for student in students:
                                                          key=special_note_key)  # 특정 키를 설정하여 일관성을 유지
 
 # 출석 저장 버튼
-if st.button("출석 저장 📝"):
+if st.button("결석 저장 📝"):
     # 출석 상태 기록
     attendance_records = {name: status for name, status in attendance_status.items()}
 
     # 출석 결과로 DataFrame 생성
-    df = pd.DataFrame(attendance_records.items(), columns=["학생 이름", "출석 여부"])
-    df["출석 여부"] = df["출석 여부"].apply(lambda x: "출석" if x else "결석")  # 결과를 적절하게 표시
+    df = pd.DataFrame(attendance_records.items(), columns=["학생 이름", "결석 여부"])
+    df["결석 여부"] = df["결석 여부"].apply(lambda x: "✖️" if x else "⭕")  # 결과를 적절하게 표시
 
     # 특기사항을 DataFrame에 추가
     df["특기사항"] = [special_notes[f"{student['name']}_note"] for student in students]  # 특기사항 수집
