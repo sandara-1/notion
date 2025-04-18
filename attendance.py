@@ -46,16 +46,20 @@ selected_date = st.selectbox("날짜 선택", date_options)
 
 # 출석 체크 박스 표시
 attendance_status = {}
+special_notes = {}
+
+# 날짜가 선택될 때마다 입력 필드를 초기화
+if selected_date not in st.session_state:
+    st.session_state[selected_date] = {}
+
+# 학생별 출석 체크 및 특기사항 입력
 for student in students:
-    attendance_status[student['name']] = st.checkbox(f"{student['name']} ({student['id']})")
+    attendance_status[student['name']] = st.checkbox(f"{student['name']} ({student['id']})", value=st.session_state[selected_date].get(student['name'], False))
 
-# 특기사항 입력
-if 'special_notes' not in st.session_state:
-    st.session_state.special_notes = {}
-
-# 선택된 날짜에 해당하는 특기사항 관리
-special_note_key = f"special_note_{selected_date}"
-special_notes = st.text_area("특기사항", st.session_state.special_notes.get(special_note_key, ""))
+    # 특기사항 입력 필드
+    special_note_key = f"{student['name']}_note"
+    special_notes[special_note_key] = st.text_input(f"특기사항 ({student['name']})",
+                                                     value=st.session_state[selected_date].get(special_note_key, ""))
 
 # 출석 저장 버튼
 if st.button("출석 저장 📝"):
@@ -67,7 +71,7 @@ if st.button("출석 저장 📝"):
     df["출석 여부"] = df["출석 여부"].apply(lambda x: "출석" if x else "결석")  # 결과를 적절하게 표시
 
     # 특기사항을 DataFrame에 추가
-    df["특기사항"] = special_notes
+    df["특기사항"] = [special_notes[f"{student['name']}_note"] for student in students]  # 특기사항 수집
     df["날짜"] = selected_date  # 날짜 추가
 
     # 파일이 이미 존재하고 형식이 잘못된 경우 파일 삭제
@@ -80,8 +84,12 @@ if st.button("출석 저장 📝"):
     # 파일에 데이터 저장
     df.to_csv(attendance_file, mode='w', index=False)
 
-    # 세션 상태에 특기사항 저장
-    st.session_state.special_notes[special_note_key] = special_notes
+    # 세션 상태에 각각의 출석 기록과 특기사항 저장
+    st.session_state[selected_date] = {}
+    for student in students:
+        st.session_state[selected_date][student['name']] = attendance_status[student['name']]
+        st.session_state[selected_date][f"{student['name']}_note"] = special_notes[f"{student['name']}_note"]
+
     st.success(f"{selected_date} 출석 기록이 저장되었습니다.")
 
 # 저장된 출석 기록을 불러오기
