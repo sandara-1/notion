@@ -53,9 +53,9 @@ for student in students:
 if 'special_notes' not in st.session_state:
     st.session_state.special_notes = {}
 
-# 선택한 날짜에 해당하는 특기사항 관리
+# 선택된 날짜에 해당하는 특기사항 관리
 special_note_key = f"special_note_{selected_date}"
-special_notes = st.text_area("특기사항", st.session_state.special_notes.get(special_note_key, "여기에 특기사항을 입력하세요..."))
+special_notes = st.text_area("특기사항", st.session_state.special_notes.get(special_note_key, ""))
 
 # 출석 저장 버튼
 if st.button("출석 저장 📝"):
@@ -68,17 +68,18 @@ if st.button("출석 저장 📝"):
 
     # 특기사항을 DataFrame에 추가
     df["특기사항"] = special_notes
+    df["날짜"] = selected_date  # 날짜 추가
 
-    # 세션 상태에 특기사항 저장
-    st.session_state.special_notes[special_note_key] = special_notes
-
-    # 날짜와 출석 기록 저장
+    # 파일에 데이터 저장
     if not os.path.isfile(attendance_file):
         # 파일이 없으면 새로운 파일 생성
         df.to_csv(attendance_file, mode='w', index=False)
     else:
-        # 파일이 있으면 추가
+        # 파일이 있으면 데이터를 추가
         df.to_csv(attendance_file, mode='a', index=False, header=False)
+
+    # 세션 상태에 특기사항 저장
+    st.session_state.special_notes[special_note_key] = special_notes
 
     st.success(f"{selected_date} 출석 기록이 저장되었습니다.")
 
@@ -87,3 +88,4 @@ if os.path.isfile(attendance_file):
     st.subheader("이전 출석 기록")
     previous_records = pd.read_csv(attendance_file)
     st.dataframe(previous_records)  # 이전 기록을 데이터프레임으로 보여주기
+
