@@ -56,19 +56,22 @@ special_notes = st.text_area("특기사항", st.session_state.special_notes.get(
 
 # 출석 저장 버튼
 if st.button("결석 저장 📝"):
+    # 출석 상태 기록
     attendance_records = {name: status for name, status in attendance_status.items()}
 
     # 출석 결과를 표시하기 위해 DataFrame으로 변환
     df = pd.DataFrame(attendance_records.items(), columns=["학생 이름", "결석 여부"])
-    df["결석 여부"] = df["결석 여부"].apply(lambda x: "결석" if x else "출석")
+    df["결석 여부"] = df["결석 여부"].apply(lambda x: "✖️" if x else "⭕")  # 올바른 열 이름 사용
 
     # 특기사항을 DataFrame에 추가
     df["특기사항"] = special_notes
 
-    # 특기사항 저장
+    # 특기사항과 출석 기록을 세션 상태에 저장
     st.session_state.special_notes[special_note_key] = special_notes
+    st.session_state.attendance_records = df
 
-    st.success(f"{selected_date} 결석 기록이 저장되었습니다:")
+    st.success(f"{selected_date} 출석 기록이 저장되었습니다:")
 
-    # 결과 출력
-    st.dataframe(df)  # 출석 결과를 테이블 형태로 출력
+# 저장된 출석 기록이 있다면 보여주기
+if 'attendance_records' in st.session_state:
+    st.dataframe(st.session_state.attendance_records)  # 출석 결과를 테이블 형태로 출력
