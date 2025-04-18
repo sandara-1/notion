@@ -44,7 +44,7 @@ attendance_file = "attendance_records.csv"
 # 날짜 선택하기
 selected_date = st.selectbox("날짜 선택", date_options)
 
-# 출석 체크 박스 표시
+# 출석 체크 박스 표시 및 특기사항 입력
 attendance_status = {}
 special_notes = {}
 
@@ -54,12 +54,15 @@ if selected_date not in st.session_state:
 
 # 학생별 출석 체크 및 특기사항 입력
 for student in students:
-    attendance_status[student['name']] = st.checkbox(f"{student['name']} ({student['id']})", value=st.session_state[selected_date].get(student['name'], False))
+    # 출석 체크박스 생성
+    attendance_status[student['name']] = st.checkbox(f"{student['name']} ({student['id']})",
+                                                     value=st.session_state[selected_date].get(student['name'], False))
 
     # 특기사항 입력 필드
     special_note_key = f"{student['name']}_note"
     special_notes[special_note_key] = st.text_input(f"특기사항 ({student['name']})",
-                                                     value=st.session_state[selected_date].get(special_note_key, ""))
+                                                     value=st.session_state[selected_date].get(special_note_key, ""),
+                                                     key=special_note_key)  # 특정 키를 설정하여 일관성을 유지
 
 # 출석 저장 버튼
 if st.button("출석 저장 📝"):
@@ -92,15 +95,17 @@ if st.button("출석 저장 📝"):
 
     st.success(f"{selected_date} 출석 기록이 저장되었습니다.")
 
-# 저장된 출석 기록을 불러오기
+# 저장된 출석 기록을 선택하기 위한 날짜 선택
 if os.path.isfile(attendance_file):
-    try:
-        previous_records = pd.read_csv(attendance_file)
-        st.subheader("이전 출석 기록")
-        st.dataframe(previous_records)  # 이전 기록을 데이터프레임으로 보여주기
-    except pd.errors.ParserError:
-        st.error("CSV 파일이 잘못된 형식입니다. 파일을 삭제하였습니다.")
-    except Exception as e:  # 오류 메시지를 표시할 때 변수 명시
-        st.error(f"파일을 읽는 동안 오류가 발생했습니다: {e}")
+    st.subheader("이전 출석 기록 보기")
+
+    # 날짜 선택 옵션을 추가
+    previous_dates = pd.read_csv(attendance_file)["날짜"].unique()
+    selected_previous_date = st.selectbox("날짜 선택", previous_dates)
+
+    # 선택한 날짜의 출석 기록을 필터링
+    records_for_date = pd.read_csv(attendance_file)
+    records_for_date = records_for_date[records_for_date["날짜"] == selected_previous_date]
+    st.dataframe(records_for_date)  # 선택한 날짜의 출석 기록을 데이터프레임으로 보여주기
 else:
     st.warning("현재 저장된 출석 기록이 없습니다.")
