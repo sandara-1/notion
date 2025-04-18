@@ -66,12 +66,19 @@ if st.button("결석 저장 📝"):
     # 특기사항을 DataFrame에 추가
     df["특기사항"] = special_notes
 
+
     # 특기사항과 출석 기록을 세션 상태에 저장
     st.session_state.special_notes[special_note_key] = special_notes
-    st.session_state.attendance_records = df
+    if 'attendance_records' not in st.session_state:
+        st.session_state.attendance_records = {}
 
-    st.success(f"{selected_date} 출석 기록이 저장되었습니다:")
+    # 날짜별 출석 결과를 저장
+    st.session_state.attendance_records[selected_date] = df
+
+    st.success(f"{selected_date} 출석 기록이 저장되었습니다.")
 
 # 저장된 출석 기록이 있다면 보여주기
 if 'attendance_records' in st.session_state:
-    st.dataframe(st.session_state.attendance_records)  # 출석 결과를 테이블 형태로 출력
+    for date, records in st.session_state.attendance_records.items():
+        st.subheader(f"{date} 출석 기록")
+        st.dataframe(records)  # 출석 결과를 테이블 형태로 출력
