@@ -77,15 +77,11 @@ if st.button("출석 저장 📝"):
     df["특기사항"] = [special_notes[f"{student['name']}_note"] for student in students]  # 특기사항 수집
     df["날짜"] = selected_date  # 날짜 추가
 
-    # 파일이 이미 존재하고 형식이 잘못된 경우 파일 삭제
+    # 파일이 이미 존재하는 경우, 데이터를 추가
     if os.path.isfile(attendance_file):
-        try:
-            previous_records = pd.read_csv(attendance_file)
-        except pd.errors.ParserError:
-            os.remove(attendance_file)  # 잘못된 CSV 파일 삭제
-
-    # 파일에 데이터 저장
-    df.to_csv(attendance_file, mode='w', index=False)
+        df.to_csv(attendance_file, mode='a', header=False, index=False)  # 기존 데이터에 추가
+    else:
+        df.to_csv(attendance_file, mode='w', index=False)  # 새로 생성
 
     # 세션 상태에 각각의 출석 기록과 특기사항 저장
     st.session_state[selected_date] = {}
