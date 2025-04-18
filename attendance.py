@@ -54,22 +54,19 @@ if selected_date not in st.session_state:
 
 # 학생별 출석 체크 및 특기사항 입력
 for student in students:
-    # 열 생성
-    cols = st.columns([1, 4, 2])  # 체크박스, 특기사항 입력, 여유 공간
-    with cols[0]:  # 체크박스
-        attendance_status[student['name']] = st.checkbox("",
-                                                         value=st.session_state[selected_date].get(student['name'], False),
-                                                         key=f"checkbox_{student['id']}")  # 고유한 키 추가
+    # 열을 생성하여 체크박스와 특기사항 입력을 나란히 배치
+    col1, col2 = st.columns([2, 5])  # 체크박스는 더 좁게, 입력은 더 넓게
+    with col1:
+        # 출석 체크박스 생성
+        attendance_status[student['name']] = st.checkbox(f"{student['name']} ({student['id']})",
+                                                         value=st.session_state[selected_date].get(student['name'], False))
 
-    with cols[1]:  # 특기사항 입력
+    with col2:
+        # 특기사항 입력 필드 (라벨 없이)
         special_note_key = f"{student['name']}_note"
         special_notes[special_note_key] = st.text_input("",  # 빈 문자열로 라벨 제거
                                                          value=st.session_state[selected_date].get(special_note_key, ""),
-                                                         key=f"note_{student['id']}")  # 고유한 키 추가
-
-    # 여유 공간 (빈 열을 추가하여 배열 맞추기)
-    with cols[2]:
-        st.write("")  # 여유 공간을 만들기 위해 남겨둠
+                                                         key=special_note_key)  # 특정 키를 설정하여 일관성을 유지
 
 # 출석 저장 버튼
 if st.button("출석 저장 📝"):
