@@ -76,7 +76,7 @@ if st.button("출석 저장 📝"):
         df.to_csv(attendance_file, mode='w', index=False)
     else:
         # 파일이 있으면 데이터를 추가
-        df.to_csv(attendance_file, mode='a', index=False, header=False)
+        df.to_csv(attendance_file, mode='a', header=False, index=False)
 
     # 세션 상태에 특기사항 저장
     st.session_state.special_notes[special_note_key] = special_notes
@@ -85,7 +85,13 @@ if st.button("출석 저장 📝"):
 
 # 저장된 출석 기록을 불러오기
 if os.path.isfile(attendance_file):
-    st.subheader("이전 출석 기록")
-    previous_records = pd.read_csv(attendance_file)
-    st.dataframe(previous_records)  # 이전 기록을 데이터프레임으로 보여주기
-
+    try:
+        previous_records = pd.read_csv(attendance_file, encoding='utf-8')
+        st.subheader("이전 출석 기록")
+        st.dataframe(previous_records)  # 이전 기록을 데이터프레임으로 보여주기
+    except pd.errors.ParserError:
+        st.error("CSV 파일을 읽는 과정에서 오류가 발생했습니다. 파일이 올바른 형식인지 확인하세요.")
+    except Exception as e:
+        st.error(f"파일을 읽는 동안 오류가 발생했습니다: {e}")
+else:
+    st.warning("현재 저장된 출석 기록이 없습니다.")
