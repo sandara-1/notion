@@ -58,13 +58,14 @@ for student in students:
     cols = st.columns([1, 4, 2])  # 체크박스, 특기사항 입력, 여유 공간
     with cols[0]:  # 체크박스
         attendance_status[student['name']] = st.checkbox("",
-                                                         value=st.session_state[selected_date].get(student['name'], False))
+                                                         value=st.session_state[selected_date].get(student['name'], False),
+                                                         key=f"checkbox_{student['id']}")  # 고유한 키 추가
 
     with cols[1]:  # 특기사항 입력
         special_note_key = f"{student['name']}_note"
         special_notes[special_note_key] = st.text_input("",  # 빈 문자열로 라벨 제거
                                                          value=st.session_state[selected_date].get(special_note_key, ""),
-                                                         key=special_note_key)  # 특정 키를 설정하여 일관성을 유지
+                                                         key=f"note_{student['id']}")  # 고유한 키 추가
 
     # 여유 공간 (빈 열을 추가하여 배열 맞추기)
     with cols[2]:
