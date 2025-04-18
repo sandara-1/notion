@@ -62,9 +62,9 @@ for student in students:
                                                          value=st.session_state[selected_date].get(student['name'], False))
 
     with col2:
-        # 특기사항 입력 필드
+        # 특기사항 입력 필드 (라벨 없이)
         special_note_key = f"{student['name']}_note"
-        special_notes[special_note_key] = st.text_input(f"특기사항",
+        special_notes[special_note_key] = st.text_input("",  # 빈 문자열로 라벨 제거
                                                          value=st.session_state[selected_date].get(special_note_key, ""),
                                                          key=special_note_key)  # 특정 키를 설정하여 일관성을 유지
 
